@@ -18,6 +18,16 @@ app.get('/', (req, res) => {
 
 client.connect(err => {
   const productCollection = client.db("firstdb").collection("education");
+  
+  app.get('/products', (req, res) => {
+    productCollection.find({}).limit(5)
+    .toArray((err, documents) => {
+        res.send(documents);
+    })
+  })
+  
+  
+  
   app.post("/addProduct", (req, res) => {
     const product = req.body;
     productCollection.insertOne(product)
