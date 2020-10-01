@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
 
+
 const password = 'UC6hLYmm2fFC7r2';
 
 const uri = "mongodb+srv://MohammadRiyad:UC6hLYmm2fFC7r2@cluster0.qguwb.mongodb.net/firstdb?retryWrites=true&w=majority";
@@ -27,6 +28,12 @@ client.connect(err => {
     })
   })
   
+  app.get('/product/:id', (req, res) => {
+    productCollection.find({_id: ObjectId(req.params.id)})
+    .toArray((err, documents) => {
+      res.send(documents[0]);
+    })
+  })
   
   
   app.post("/addProduct", (req, res) => {
@@ -44,6 +51,7 @@ client.connect(err => {
       console.log(result);
     })
   })
+
   console.log('Database Connected')
   
   //client.close();
