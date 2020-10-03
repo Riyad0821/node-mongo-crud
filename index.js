@@ -12,6 +12,12 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use((err, req, res, next) => {
+  res.locals.error = err;
+  const status = err.status || 500;
+  res.status(status);
+  res.render('error');
+});
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
@@ -36,19 +42,30 @@ client.connect(err => {
   })
   
   
-  app.post("/addProduct", (req, res) => {
+  app.post('/addProduct', (req, res) => {
     const product = req.body;
     productCollection.insertOne(product)
     .then(result => {
       console.log('one product added')
-      res.send('success');
+      res.redirect('/');
+    })
+  })
+
+  app.patch('/update/:id', (req, res) => {
+    console.log(req.body.price);
+    productCollection.updateOne({_id: ObjectId(req.params.id)},
+    {
+      $set: {price: req.body.price, quantity: req.body.quantity}
+    })
+    .then (result => {
+      res.sendStatus(result.modifiedCount)
     })
   })
 
   app.delete('/delete/:id', (req, res) => {
     productCollection.deleteOne({_id: ObjectId(req.params.id)})
     .then(result => {
-      console.log(result);
+      res.send(result.deletedCount > 0);
     })
   })
 
